@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/quick.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:59 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Quick Start</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p>Quick Start<p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Quick Start</h1>
+
+    <p>Type any command example below without arguments to see the CL documentation. </p>
+    <p>Select a model set directory (<code>$</code> is *nix CL prompt, <code>&gt;</code> is Windows CL prompt):</p>
+        <p><code>
+        $> cd ~sdk/data/csam/Animate
+        </code></p>
+    <p>Create a random face in a FaceGen .FG file:</p>
+        <p><code>
+        $> fg3 create random any any Jan.fg
+        </code></p>
+    <p>View the result as a face cutout (Windows only):</p>
+        <p><code>$> fg3 view fg Jan.fg</code></p>
+    <p>Or create a face from a photograph (Full SDK only.
+        Windows: <a href="https://facegen.com/modeller35_help.htm#photofit">How to place the points on the photo</a>
+        OS X / Linux: <a href="commands.html#photofit">Requires boot points in photo.bpt.xml</a>):
+    </p>
+        <p><code>$> fg3pf photofit Jan.fg photo.jpg</code></p>
+    <p>Estimate demographics (age, gender, etc.):</p>
+        <p><code>$> fg3 controls demographic edit Jan.fg</code></p>
+    <p>Change age to 65:</p>
+        <p><code>
+        $> fg3 controls demographic edit Jan.fg age 65 JanOld.fg
+        </code></p>
+    <p>Construct head, tongue, teeth and hair meshes for this face:</p>
+        <p><code>
+        $> fg3 cssm Head/HeadHires JanOld.fg JanHead.tri<br/>
+        $> fg3 cssm Head/SockTongue JanOld.fg JanSockTongue.tri<br/>
+        $> fg3 cssm Head/Teeth JanOld.fg JanTeeth.tri<br/>
+        $> fg3 cssm Hair/MidlengthStraight JanOld.fg JanHair.tri<br/>
+        </code></p>
+    <p>Construct skin color maps for this face:</p>
+        <p><code>
+        $> fg3 cscm Head/HeadHires JanOld.fg JanHead.jpg<br/>
+        </code></p>
+    <p>Copy over non-skin color maps:</p>
+        <p><code>
+        $ cp Head/SockTongue.jpg JanSockTongue.jpg <br/>
+        $ cp Head/Teeth.jpg JanTeeth.jpg <br/>
+        $ cp Hair/MidlengthStraight_Brown.tga JanHair.tga <br/>
+        > copy Head\SockTongue.jpg JanSockTongue.jpg <br/>
+        > copy Head\Teeth.jpg JanTeeth.jpg <br/>
+        > copy Hair\MidlengthStraight_Brown.tga JanHair.tga
+        </code></p>
+    <p>List animation morphs in the head mesh:</p>
+        <p><code>
+        $> fgbl morph list JanHead.tri
+        </code></p>
+    <p>Add a half-smile:</p>
+        <p><code>
+        $> fgbl morph anim HalfSmile JanHead.tri JanSockTongue.tri "Expression SmileOpen" 0.5 <br>
+        </code></p>
+    <p>Render an image to 'JanRender.png':</p>
+        <p><code>
+        $> fgbl render setup JanRender.xml JanHeadHalfSmile.tri JanHead.jpg JanSockTongueHalfSmile.tri JanSockTongue.jpg JanTeeth.tri JanTeeth.jpg JanHair.tri JanHair.tga
+        </code></p>
+    <p>Modify 'JanRender.xml' to change render parameters such as lighting and pose then re-render:</p>
+        <p><code>
+        $> fgbl render run JanRender.xml JanRender.jpg
+        </code></p>
+    <p>Export to FBX format:</p>
+        <p><code>
+        $> fgbl mesh export JanFbx.fbx JanHeadHalfSmile.tri JanHead.jpg JanSockTongueHalfSmile.tri JanSockTongue.jpg JanHair.tri JanHair.tga <br/>
+        </code></p>
+    <p>Create 10 random face images (<code>rand0000.jpg</code> ...) with random hair, expression and lighting:</p>
+        <p><code>
+        $> fg3 random setup randOptions Head/HeadHires Head/SockTongue Head/Teeth -s "" Hair/MidlengthStraight -m "" "Expression Anger" "Expression Disgust"</br>
+        $> fg3 random run randOptions rand 10
+        </code></p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/quick.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:59 GMT -->
+</html>

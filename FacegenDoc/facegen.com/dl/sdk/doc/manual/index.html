@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:48 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Install</title>
+</head>
+<body>
+<nav>
+<p>Install<p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Install</h1>
+
+<h2>Developer Requirements</h2>
+    <p>( Windows | Linux | MacOS )</p>
+<h2>Install</h2>
+    <p>Path in which you have placed this sdk: <code>~sdk</code></p>
+    <p>FaceGen executables load data from <code> ~sdk/data/ </code>
+       This directory must be present in the directory containing the executable, or any of its
+       parent directories. It must contain the file <code> _facegen_data_dir.flag </code>
+    <h3>Windows</h3>
+    <p><code> &gt PATH=%PATH%;~sdk\bin\win\x64\vs19\release\;~sdk\bin\win\x64\ </code>
+    <h3>Linux</h3>
+    <p><code> $ PATH=$PATH:~sdk/bin/linux/x64/gcc/release/:~sdk/bin/linux/x64/ </code>
+    <p>Set permissions on binary tools:<br>
+    <code>
+        $ chmod +x ~sdk/bin/linux/x64/fg*
+    </code></p>
+    <p>Set permissions on the pre-built binaries (no need if building from source):<br>
+    <code>
+        $ chmod +x ~sdk/bin/linux/x64/gcc/release/fg*
+    </code></p>
+    <h3>MacOS</h3>
+    <p><code> $ PATH=$PATH:~sdk/bin/macos/x64/clang/release/:~sdk/bin/macos/x64/ </code> 
+    <p>Set permissions on the binary tools:<br>
+    <code>
+        $ chmod +x ~sdk/bin/macos/x64/fg* <br>
+        $ xattr -d com.apple.quarantine ~sdk/bin/macos/x64/fg*
+    </code></p>
+    <p>Set permissions on the pre-built binaries (no need if building from source):<br>
+    <code>
+        $ chmod +x ~sdk/bin/macos/x64/clang/release/fg*<br>
+        $ xattr -d com.apple.quarantine ~sdk/bin/macos/x64/clang/release/fg*
+    </code></p>
+<h2> Command Line Executables </h2>
+    <p> <code> fgbl </code> - FaceGen base library (open source) commands </p>
+    <p> <code> fg3 </code> - FaceGen Main SDK commands </p>
+    <p> <code> fg3pf </code> - FaceGen Photofit commands </p>
+    <p> <code> fg3t </code> - FaceGen Integration Tools </p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:54 GMT -->
+</html>

@@ -1,0 +1,12 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sun, 07 Aug 2022 23:55:46 at https://facegen.com/dl/sdk/docs.html +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://facegen.com/dl/sdk/docs.html -O1 "C:\My Web Sites\FacegenDoc" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+23:56:08	Error: 	"Forbidden" (403) at link https://facegen.com/dl/sdk/doc/apiref/search.php (from https://facegen.com/dl/sdk/doc/apiref/index.html)
+
+HTTrack Website Copier/3.49-2 mirror complete in 22 seconds : 47 links scanned, 45 files written (490943 bytes overall) [515393 bytes received at 23426 bytes/sec], 23.5 requests per connection
+(1 errors, 0 warnings, 0 messages)

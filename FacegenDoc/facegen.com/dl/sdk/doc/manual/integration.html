@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/integration.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Engine Integration</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p>Engine Integration<p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Engine Integration</h1>
+
+<h2>Shape</h2>
+    <p> The best way to integrate an SSM is to update the vertex positions of your
+        mesh structure.</p>
+    <p> FaceGen's mesh file formats are limited. In most cases, you will be using another format for storing
+        your polygonal (and related) data and just using the SSM to move your vertices.
+        The best way to do this is to preserve your vertex ordering (and count).</p>
+    <p> Some 3D engines will change your mesh's vertex ordering (or even count) when importing,
+        to optimize for rendering. Depending on the engine, you can either disable this,
+        or re-import after you modify vertex positions in your original ordering.</p>
+    <p> If you are making use of FaceGen stat morphs, then you will either need to copy over the morph target
+        vertex positions, or just have these embedded in your original vertex list.</p>
+<h2>Surface Normals</h2>
+    <p> For best results you should regenerate the surface normals of your head after applying an SSM
+        (ie changing the shape). Not doing this will reduce the visual quality.</p>
+    <p> For this to work with your normal maps (useful for smile lines, wrinkles, etc) you should use tangent
+        space normal maps.</p>
+    <p> You will get the best results by putting as many polygons as you can into the face.</p>
+    <p> These considerations are not unique to SSMs. When you animate the face you are also changing its shape,
+        and the same considerations apply.</p>
+<h2>Animation</h2>
+    <p> Your animation targets should work with all faces created with FaceGen. There are two ways that FaceGen
+        does this.</p>
+    <p> First, the overall size of any generated face is the same. This means that most animation targets will look
+        correct on any face. For delta morph targets (aka blendshapes), just ensure they are stored as deltas
+        rather than absolute positions. For bone-based targets, no change should be necessary.</p>
+    <p> Second, if you are using morphs, there are a few targets for which the target position must be specified
+        absolutely, such as eye motion or blinks. For these movements, FaceGen provides 'stat morphs',
+        which are just target morphs in which the target vertex positions are transformed for a given face
+        in the same way as the base vertex positions. </p>
+<h2>Eye Movements</h2>
+    <p> As demonstrated in Modeller, eye movement can be reasonably approximated using FaceGen stat morphs
+        to warp the eye patch vertex positions. This approach has the advantage of preserving the original
+        realistic detailed texture of the eyes. </p>
+    <p> However if you must use bone-based rotation for eye movement in your engine, the 'fg3t ssmEyeC'
+        and 'fg3t ssmEyeI' command can be used to generate SSM data for the eyes that keep them spherical.
+        Note that when the eyes rotate they will expose colors which are not accurate.
+    </p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/integration.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

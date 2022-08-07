@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/faq.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - FAQ</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p>FAQ<p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - FAQ</h1>
+
+<h2>Clamping controls to reasonable values</h2>
+    <p>If you want clamping, we recommend only clamping caricature and asymmetry values.</p>
+    <p>Clamping individual controls is not recommended. A given control value may look fine by itself but bad in combination with a correlated control.</p>
+    <p>To achieve interactive clamping, you need to clamp the caricature (shape and color) and asymmetry (shape) values for the all-races distribution. If the given caricature value is larger than a limit, say 3, then set it back to 3.</p>
+    <p>Note that this will make your sliders non-deterministic; after clamping, they will not take on the exact values you originally specified.</p>
+    <p>We recommend clamping shape (caricature and asymmetry) at 3.0 and color at 2.0, since users enjoy some room for creative expression.
+<h2>Moving slider X without affecting slider Y</h2>
+    <p>You may not really want to do this. This is because many of the sliders are correlated. For example, if slider X is lip thickness and slider Y is age, then decreasing the lip thickness has to affect the age value since lips get thinner as we age.</p>
+    <p>If you decide you still need a control like this, there are two ways to go about it; inverting the covariance matrix between them, and using a non-deterministic control. The latter is easier if you're already doing it for clamping.</p>
+    <p>Inverting the covariance matrix is what FaceGen uses to keep gender and age controls independent (<a href="indepth.html#offset">details</a>). It works well since those particular controls are not very correlated. The age/gender code can be copied with minor modifications for the controls you want to apply it to. The problem with this approach is that if the controls are closely correlated, the results can be unexpected.</p>
+    <p>Non-deterministic controls are simpler mathematically, but change the user interface. The user moves the X control but it doesn't move all the way to the desired value. To do this just removing the component of the X delta which is parallel to the Y control (all in face space):
+    \[ \mathbf{x'=x_0+\Delta(1-\frac{\Delta\cdot y}{\left \| \Delta \right \|\left \| y \right \|})}  \]
+    </p>
+<h2>Generating female faces.</h2>
+    <p>For best results generating female faces, use the 'FANRACE_ALL' selection. Generating female faces from specific races is achieved in a way that can sometimes result in beard shadowing for females.</p>
+    <p>If you need random female faces from specific racial groups, best results can be obtained by repeatedly generating faces from the 'FANRACE_ALL' group until one is found with a racial control value close to the desired one.</p>
+<h2>Rendering faces</h2>
+    <p>Faces look odd when the camera is too close (ie wide-angle lens) or when the camera too far (ie strong zoom lens)</p>
+    <p>This is because the human eye effectively has a medium-angle lens (our periphal vision doesn't count here, since it has so little resolution), so that's how we're used to seeing faces.</p>
+    <p>When choosing a vantage point for your face creation tool, make sure not to have it too close or you'll get the classic wide-angle narrow face and large nose look. In real-world units, you typically want to have your camera 5-10  feet from the subject.</p>
+<h2>Genetic interface</h2>
+    <p>The 'genetic' interface in Modeller is achieved by randomly perturbing a base face coordinate (shown in the centre of the grid) to create the variations seen around the edge of the grid.</p>
+    <p>To create each variation <strong>a</strong> on the base face coordinate <strong>c</strong> with randomness factor <em>f</em> &isin; (0,1):
+    <ol>
+        <li>Generate a random face coordinate, <strong>r</strong>.</li>
+        <li>Interpolate between them by
+            <strong>a</strong>=<em>f</em>&nbsp;<strong>r</strong>+(1-f)<strong>c</strong>.</li>
+    </ol>
+<h2>Fantasy Races</h2>
+    <p>In this case, integrate your head using the 'fg3t' tool as described above, but then swap in your original
+       base mesh (.TRI) and texture image (.PNG) instead of the FaceGen-generated one.</p>
+    <p>You may want to exaggerate the controls, as the subtle changes between human
+       faces will be less apparent against a radically different base shape and color.</p>
+    <p>Increase the numerical range the linear controls map to, and increase the clamping values if you have clamping.</p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/faq.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

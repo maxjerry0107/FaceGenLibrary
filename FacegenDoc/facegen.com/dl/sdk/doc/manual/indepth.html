@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/indepth.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - In Depth</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p>In Depth<p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - In Depth</h1>
+
+<h2>Statistical Appearance Models (SAMs)</h2>
+    <p>We make use of a standard statistical technique called principal components analysis (PCA) to summarize the distribution of samples in a data set.</p>
+    <p>The basic idea is to represent a data set of shapes or images by a single mean (average) instance, plus a small number (ie much smaller than the number of samples in the data set) of PCA modes, which are deltas from the mean. We can then reconstruct any number of faces by linearly combining these PCA modes and adding them to the mean.</p>
+    <p>PCA modes have several useful properties which are essentially impossible to achieve using artist-created controls:</p>
+    <ol>
+        <li>The modes characterize the actual statistical distribution of the samples, allowing us to create controls which always look realistic.
+        </li>
+        <li>The modes are statistically independent. This means that picking random co-efficients for each mode according to a standard normal distribution (ie. a random face), gives us instances which are just as plausible as the others in our data set.
+        </li>
+        <li>The modes are optimal for reconstructing the samples in the least squares error sense. This means that we can achieve a high level of compression by storing faces just by their mode co-efficients.
+        </li>
+    </ol>
+    <p>Mathematically, the modes form the basis for our face space. The modes are statistically orthogonal and their magnitudes correspond to one standard deviation in our dataset.</p>
+    <p>The PCA modes are stored in our file formats in decreasing order of their magnitudes. Thus if you require a smaller number of basis vectors due to resource constraints, you retain the optimal least squares reconstruction property by removing modes from the end.</p>
+<h2>Statistical Shape Models (SSMs)</h2>
+    <p>Shape is represented by the vertex positions of a polygonal model of fixed mesh topology. The mean model is a standard polygonal model consisting of triangular and/or quad facets. The modes are one standard deviation 3D displacements for each vertex.</p>
+    <p>The shape modes of a SSM preserve vertex-feature correspondence. For example, the vertex at the tip of the nose of the mean face will remain at the tip of the nose for any face constructed using the SSM.</p>
+    <p>FaceGen SSMs are statistically defined only over the face region. This area covers from about half-way up the forehead to just below where the chin meets the neck, and does not include the ears. Shape modification in areas outside of this face region are just extrapolations from the face region shape statistics. There are no specific controls for the ears, neck or back of the head.</p>
+<h2>Statistical Color Models (SCMs)</h2>
+    <p>The mean color map is a 24-bit RGB color image. Each mode is stored as a signed RGB8 map, along with a floating point scaling factor. Vertex UV coordinates do not change.</p>
+    <p>Texture modes of an SCM preserve UV-feature correspondence. For example, the pixel at the corner of the eye will remain at the corner of the eye for all generated faces. The exception is eyebrows, which, because of their variable positioning on the face, are not always located at the same place in the texture map.</p>
+    <p>FaceGen SCMs are statistically defined only over the face region. Texture values in areas outside of the face region are extrapolated from the face region and are thus always skin-coloured.
+    <p>You can modify the SCM mean image to add any features whose color will vary with the skin color, such as wrinkles or tatoos. Hair textures or other opaque objects whose color is not dependent on skin color should be composited on after creation of the final color map.</p>
+    <p>The SCM has been constrained to force the colour around the middle of the neck and below to be constant, for simpler integration.</p>
+<h2>Model Sets</h2>
+    <p>Realistic changes in face shape inevitably affect the shape of the whole head; long thin faces have longer thinner heads, and short wide faces have shorter, wider heads. Thus modes that represent different faces must also include some morphing of the entire head.</p>
+    <p>This can make it difficult to add  accessory models such as hairstyles or facial hair to a morphed head model. The solution is to have a separate SSM for each  accessory model. If the same SSM co-efficients are applied to both the head model and its accessory models, they will always fit together seamlessly.</p>
+    <p>Similarly, a SAM can be generated for each level-of-detail model for the head, allowing the same face to be applied to any of the LOD models.</p>
+    <p>A head model plus its LOD and accessory models is referred to as a model set. The SDK includes the FaceGen default model set, but you can always add models or model sets using the 'fg3t' tools.</p>
+    <p>In general, the head model can also be broken into any number of SAMs, for instance if you want the eyes to be a separate model in FaceGen. This can be useful if you require a separate texture map for the eyes.</p>
+    <p>For example, the FaceGen Default model set consists of a low, medium and high resolution SAM for the skin and separate models for each eye. The Aqua model set, however has a SAM for the face area (including the eyes) and a SAM for the back of the head.</p>
+<a name="modulation"></a>
+<h2>Detail Texture Modulation</h2>
+    <p>After reconstruction of the color map using an SCM, the resulting image contains details which are well characterized statistically - such as the lip boundaries - because they are uniquely identifiable across every face.</p>
+    <p>Other details, such as wrinkles and skin texture, are not uniquely identifiable across every face, and these get smoothed out by our statistical approach. In order to put them back in, we use the concept of a detail texture.</p>
+    <p>A detail texture is a modulation map which is applied after reconstruction of the color map from the SCM. By taking this approach, the same detail texture can be applied to any reconstructed texture.</p>
+    <p>Modulation just means that each R, G and B component of each pixel of the statistical texture is multiplied by a factor defined by the respective pixel in the modulation map. Each such factor is coded as a single unsigned byte in the range [0,255] with the modulation factor calculated by dividing by 64.</p>
+    <p>Detail textures can be created artistically (see Modeller documentation), or by using the FaceGen PhotoFit, or you can use those provided with Modeller. In the PhotoFit method, after creating a 3D face to match an image, any remaining differences between the image and the computer's rendering of the image are used to create the detail texture.</p>
+    <p>The detail texture is only defined over the face area, which is the region from about half-way up the forehead, around in front of the ears, and down to the neck just below the jaw.</p>
+    <p>In an FG file the detail texture is stored in a cylindrically projected UV layout. The image transform file (FIM) for an SCM defines the transform of the detail texture from this layout to the UV layout of the particular mesh.</p>
+    <p>The size of the detail texture is determined by the size of the input photograph. To limit the size of the detail texture created by the PhotoFit, just limit the size of the input photograph.</p>
+<h2>File Storage</h2>
+    <p>There is one SSM for each vertex list and one SCM for each color map. File types used:</p>
+    <p>
+    <ul>
+      <li>FGMESH / TRI - the polygonal structure, UVs and base shape vertex positions
+      <li>PNG / JPG - base color map
+      <li>EGM - SSM modes
+      <li>EGT - SCM modes
+      <li>FIM - image resampling map from internal layout (of detail texture) to mesh UV layout
+    </ul>
+    </p>
+    <p>Multiple SSMs & SCMs composing a face, its parts, and/or its various level-of-detail and accessory models are referred to as a model set.</p>
+<h2>Controls Data</h2>
+    <p>The distribution data characterizes the variation in facial appearance within each racial group. The controls data characterizes the effects of the many parametric controls offered by FaceGen, including age, race and gender. The distribution and controls data is stored in the file 'si.ctl'.</p>
+<h2>SAM Definitions</h2>
+    <p>A SSM consists of:</p>
+    <table align="left">
+        <tr>
+            <td><strong><span style="text-decoration:overline;">v</span><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The mean model <em>i</em>'th vertex position (a 3D position vector).</td>
+        </tr>
+        <tr>
+            <td><strong><span>v</span><sup>j</sup><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The <em>i</em>'th vertex displacement of the <em>j</em>'th symmetric shape mode (a 3D displacement vector).</td>
+        </tr>
+        <tr>
+            <td><strong><span>u</span><sup>k</sup><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The <em>i</em>'th vertex displacement of the <em>k</em>'th asymmetric shape mode (a 3D displacement vector).</td>
+        </tr>
+    </table>
+    <div style="clear:both;"></div>
+    <p>And given a set of shape co-efficients:</p>
+    <table align="left">
+        <tr>
+            <td><em><span>s</span><sub>j</sub></em></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The <em>j</em>'th symmetric shape mode coefficient.</td>
+        </tr>
+        <tr>
+            <td><em><span>a</span><sub>k</sub></em></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The <em>k</em>'th asymmetric shape mode coefficient.</td>
+        </tr>
+        <tr>
+            <td>\( \mathit{N_{s}} \)</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The number of symmetric shape modes (currently 50).</td>
+        </tr>
+        <tr>
+            <td>\( \mathit{N_{a}} \)</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The number of asymmetric shape modes (currently 30).</td>
+        </tr>
+    </table>
+    <div style="clear:both;"></div>
+    <p>We can build the specific head defined by the shape co-efficients as:
+    \[ \mathbf{v_{i}^{'}=\bar{v_{i}}+\sum_{j=1}^{N_{s}}}(\mathit{s_{j}}\mathbf{v_{i}^{j}})+\mathbf{\sum_{k=1}^{N_{a}}}(\mathit{a_{k}}\mathbf{u_{i}^{k}}) \]
+    </p>
+    <p>The idea for a STM is mathematically identical, we just re-define our variables as:</p>
+    <table align="left">
+        <tr>
+            <td><strong><span style="text-decoration:overline;">v</span><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The mean texture <em>i</em>'th pixel value (a 3-component color value).</td>
+        </tr>
+        <tr>
+            <td><strong><span>v</span><sup>j</sup><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The <em>i</em>'th pixel value of the <em>j</em>'th symmetric texture mode (a 3-component color value).</td>
+        </tr>
+        <tr>
+            <td><strong><span>u</span><sup>k</sup><sub>i</sub></strong></td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            The <em>i</em>'th pixel value of the <em>k</em>'th asymmetric texture mode (a 3-component color value).</td>
+        </tr>
+    </table>
+    <div style="clear:both;"></div>
+    <p>And so on.</p>
+    <p>We refer to the set of co-efficients for both symmetric and asymmetric, shape and texture as a coordinate vector, p, definining a point in face space.</p>
+<h2>Interactive Deformations</h2>
+    <p>Interactive deformations are defined on an SSM.</p>
+    <p>The input for a interactive deformation control is a vertex index, \( \mathit{f} \), and a deformation vector,\( \mathbf{f_{\mathit{f}}} \).
+    <br/> A symmetric face space delta is then given by:</p>
+    \[ d_{j}= \sqrt{\frac{I}{\sum_{i=1}^{I}\left \| \mathbf{v}_{i}^{j} \right \|^{2}}}\mathbf{f}_{f}\cdot \mathbf{v}_{f}^{j}\]
+    <p>Where I is the number of vertices in the SSM.</p>
+    <p>The face coordinate is then modified by:</p>
+    \[ d_{j}^{'}=s_{j}+d_{j}\]
+    <p>Similarly, the asymmetric face space delta is given by:</p>
+    \[ d_{k}= \sqrt{\frac{I}{\sum_{i=1}^{I}\left \| \mathbf{u}_{i}^{k} \right \|^{2}}}\mathbf{f}_{f}\cdot \mathbf{u}_{f}^{k}\]
+    <p>And the face coordinate is modified by:</p>
+    \[ a_{k}^{'}=a_{k}+d_{k}\] 
+<h2>Linear Controls</h2>
+    <p>The shape and texture controls (both symmetric and asymmetric) demonstrated in the Modeller program in their respective tabs are linear controls. Each linear control is defined as a direction vector, c, within a subspace of shape or texture, symmetric or asymmetric, of unit magnitude,</p>
+    \[ \left \| \mathbf{c_{i}} \right \|^{2}=1 \]
+    <p>Given a set of linear controls, <strong>c</strong><sub>i</sub>, in this sub-space, and a face coordinate sub-vector in this sub-space, <strong>p</strong>, the linear control value is given by:</p>
+    \[ c_{i}=\mathbf{c_{i}}\cdot p \]
+    <p>Modification of a face to have a desired value <em>c'<sub>i</sub></em> for this linear control us given by:  </p>
+    \[ \mathbf{p^{'}=p+\Delta c} \]
+    <p>Where</p>
+    \[ \Delta = c^{'}_{i}+c_{i}\]
+    <p>So now when we measure the linear control value of <strong>p'</strong> we get:</p>
+    \[ c^{'}_{i}=\mathbf{c_{i}\cdotp^{'}=c_{i}\cdot(p+\Delta c_{i})}=c_{i}+\Delta \]
+    <p>As expected.</p>
+    <p>Note that since the <strong>c<sub>i</sub></strong> are not orthogonal, this change of <strong>p</strong> will affect all values <em>c<sub>i</sub></em>.</p>
+<a name="offset"></a>
+<h2>Offset Linear Controls (Age and Gender)</h2>
+    <p>Age and gender are offset linear controls defined within each racial distribution, although currently identical for each race. Offset linear controls, <strong>a<sub>j</sub></strong> , are similar to linear controls, with a scalar offset, <em>O<sub>j</sub></em>, defined separately in the symmetric shape and symmetric texture sub-spaces, and with an arbitrary magnitude. They do not have an asymmetric component.</p>
+    Given a sample face coordinate, <strong>p</strong>, in a symmetric sub-space, the offset linear control value is given by:
+    \[ \mathit{a_{j}}=\mathbf{a_{j}}\cdot\mathbf{p}+\mathit{o_{j}} \]
+    <p>Age is given in years. Gender of -1 corresponds to males and +1 to females.</p>
+    <p>And to modify the face coordinate to have a given offset linear control value <em>c'<sub>j</sub></em>:</p>
+    \[ \mathbf{p^{'}=p+\Delta a_{j}} \]
+    <p>Where:</p>
+    \[ \Delta=\frac{\mathit{a_{j}^{'}-a_{j}}}{\left \|\mathbf{a_{j}}  \right \|^{2}} \]
+    <p>Again note that the <strong>a<sub>j</sub></strong> are not orthogonal so changing one will affect the others. In order to simultaneously set both age and gender to a desired value, use:</p>
+    \[ \mathbf{p^{'}=p+\sum{(\Delta_{i}a_{i})}} \]
+    <p>Where:</p>
+    \[ \Delta_{i}=\sum_{j}\left [ \mathit{M_{{\ddot{v}}}^{-1}(a_{j}^{'}-a_{j})} \right ]   \]
+    <p>Where:</p>
+    \[ \mathit{M_{\ddot{v}}}= \mathbf{a_{i} \cdot a_{j}} \]
+<h2>Race Controls</h2>
+    <p>The race controls are offset linear controls defined in the combined symmetric space (shape and texture) by the difference in racial mean positions in face space. Their use is as described above except that there is no partition into shape and texture sub-vectors.</p>
+<h2>Asymmetry</h2>
+    <p>Given the asymmetric sub-vector of a face, <strong>p</strong>, with dimensionality \( N_{a} \), the asymmetry measure is given by:</p>
+    \[ \mathit{a}=\frac{\left \| \mathbf{p} \right \|}{\sqrt{\mathit{N_{a}}}} \]
+    <p>To change the asymmetry value to a new value, \( \mathit{a^{'}} \) , the new sub-vector is given by:</p>
+    \[ \mathbf{p^{'}}=\mathit{\frac{a^{'}}{a}}\mathbf{p} \]
+    <p>The asymmetry controls are independent of the offset linear controls.</p>
+    <p>An asymmetry value of 1 is the average, and most people will have values fairly close to 1. 0 represents a perfectly symmetric face.</p>
+<h2>Caricature</h2>
+    <p>Unlike symmetry, caricature is defined on a per-race basis. Caricature is a measure of how close a sample is to the average face for a given race. The average caricature value for samples of that race is 1. Most faces have a caricature value close to 1. 0 represents the average face for that race.</p>
+    <p>Caricature is defined as the Mahalanobis distance of the symmetric sub-vector from the racial mean within the racial distribution, and is defined separately for geometry and texture components:</p>
+    \[ \mathit{c}=\left \| \mathbf{q} \right \| \]
+    <p>Where:</p>
+    \[ \mathbf{q=M_{p}(p-\mu_{p})} \]
+    <p>Where <strong>M<sub>p</sub></strong> is either the geometry-geometry partition or the texture-texture partition of the racial Mahalanobis transform:</p>
+    \[
+    \mathbf{M=\begin{bmatrix}
+    M_{GG} M_{GT}\\
+    M_{TG} M_{TT}\\
+    \end{bmatrix}}
+     \]
+    <p>And <strong>&mu;<sub>p</sub></strong> is the corresponding sub-vector of the racial mean:</p>
+    \[
+    \mathbf{\mu=\begin{bmatrix}
+    \mu_{G}\\
+    \mu_{T}\\
+    \end{bmatrix}}
+     \]
+    <p>To modify <strong>p</strong> to have a desired caricature value <em>c'</em>:</p>
+    \[ \mathbf{p^{'}}=\mathit{\frac{c^{'}}{c}}\mathbf{(p-\mu)+\mu} \]
+<h2>Attribute-Neutral Caricature</h2>
+    <p>It is often desirable not to exaggerate age and gender characteristics as part of the caricature measure. To achieve this, we proceed as above but limited to the subspace independent of these attributes. In this case we calculate:</p>
+    \[ \mathit{c}=\frac{\left \| \mathbf{q^{''}} \right \|}{\mathit{\sqrt{N_{p}-2}}} \]
+    <p>Where <em>N<sub>p</sub></em> is the dimensionality of the sub-vector and:</p>
+    \[ \mathbf{q^{''}=M_{p}(p^{''}-\mu_{p})} \]
+    <p>Where:</p>
+    \[ \mathbf{p^{''}=p-\Delta_{p}} \]
+    <p>Where:</p>
+    \[ \mathbf{\Delta_{p}=\sum_{i}\left [ \hat{b}_{i}(p\cdot \hat{b}_{i}) \right ]} \]
+    <p>Where \( \mathbf{\hat{b}_{i}} \) are the orthogonal basis vectors of the attribute subspace, which in the case of age and gender can be calculated using Gram-Schmidt orthogonalization from their axes:</p>
+    <p>\( \mathbf{\hat{b}_{1}=\hat{a}_{g}} \)</p>
+    <p>\( \mathbf{\hat{b}_{2}=\frac{r}{\left \| r \right \|}} \)</p>
+    <p>Where</p>
+    <p>\( \mathbf{r=\hat{x}_{a}-(\hat{x}_{a} \cdot \hat{x}_{g})\hat{x}_{g}} \)</p>
+    <p>Given a point in face space we can set the caricature to a new value <em>c'</em> by:</p>
+    <p>\( \mathbf{p}=\frac{c^{'}}{c}\mathbf{(p-\Delta_{p})+\Delta_{p}} \) &nbsp;&nbsp;&nbsp;&nbsp;or</p>
+    <p>\( \mathbf{p}=\frac{c^{'}}{c} \mathbf{p}+(1-\frac{c^{'}}{c}) \mathbf{\Delta_{p}} \)</p>
+    <p>This control is independent of age and gender.</p>
+<h2>Random Generate</h2>
+    <p>To generate the symmetric component, \( \mathbf{{p}}_{s} \), of a random face from a racial distribution, we generate \( {N}_{s} \) random values, \( \mathbf{{q}}_{s} \), from a standard normal distribution and transform from the Mahalanobis space of the distribution to face space:</p>
+    \[ \mathbf{{p}_{s}=M^{-1}q_{s}+\mu} \]
+    <p>Note that this is done in the combined symmetric space - including both geometry and texture dimensions.</p>
+    <p>The asymmetry distribution is just the face space basis (for all races) so we generate an asymmetric sub-vector by simply generating more random values from a standard normal distribution:</p>
+    \[ \mathbf{{p}_{a}=q_{a}} \]
+    <p>Note that the gender distribution modelled in this manner is unimodal, wheras we expect the real gender distribution to be bimodal. As we do not currently model male and female distributions separately, the best way to simulate this, if desired, is to set the gender attribute according to a bimodal distribution, as described above.</p>
+    <p>Likewise, it can also be useful to set age, caricature and/or asymmetry to a previously fixed value, as described above.</p>
+<h2>Morphing</h2>
+    <p>Stat morphs are applied to a SAM-constructed model by:</p>
+    \[ \mathbf{v}_{i}^{T}=\mathbf{v}_{i}^{'}+\sum_{j}\left [ t_{j}(\mathbf{t}_{i}^{'j}-\mathbf{v}_{i}^{'}) \right ] \]
+    <p>Where \( \mathbf{t_{i}^{'j}} \) is the SSM-transformed target position for the <em>i</em>'th vertex for the <em>j</em>'th stat morph target and \( t_{j} \) is the <em>j</em>'th stat morph co-efficient.</p>
+    <p>Diff morphs are then applied to a SAM-constructed model by:</p>
+    \[ \mathbf{v}_{i}^{D}=\mathbf{v}_{i}^{T}+\sum_{j}(d_{j}\mathbf{d}_{i}^{j})\]
+    <p>Where \( \mathbf{d}_{i}^{j} \) is the displacement vector of the <em>i</em>'th vertex of the <em>j</em>'th diff morph and \( d_{j} \) is the <em>j</em>'th diff morph co-efficient.</p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/indepth.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

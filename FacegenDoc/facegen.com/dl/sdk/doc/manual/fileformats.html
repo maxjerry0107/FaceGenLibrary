@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/fileformats.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - File Formats</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p>File Formats
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - File Formats</h1>
+
+<p>All values in data files included with this SDK are stored in little-endian format (as used by x86 and amd64).</p>
+<p>Use the 'fg3 endian' utility to convert these files to native big-endian format for use by this SDK source code on big-endian machines (eg PS3 or Xbox360).</p>
+<h2>CTL</h2>
+<p>Controls &amp; distribution densities. A binary file format. Valid for all SAMs with the same BasisKey.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>char[8]
+        </td>
+        <td>'FRCTL001'
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Geometry Basis Version - must match EGM
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Texture Basis Version - must match EGT
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>GS - Geometry symmetric basis size -- Same # as in EGM (>=0)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>GA - Geometry asymmetric basis size -- Same # as in EGM
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>TS - Texture symmetric basis size -- Same # as in EGT
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>TA - Texture asymetric basis size -- Same # as in EGT
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>LGS - # of GS linear controls (>= 0)
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;linCtrl&gt; * LGS
+        </td>
+        <td>The LGS linear controls, where:<br/>
+            &lt;linCtrl&gt; = float * GS, &lt;label&gt;, where:<br>
+            &lt;label&gt; = uint L, char[L]
+
+        </td>
+    </tr>
+    <tr>
+        <td>Uint
+        </td>
+        <td>LGA
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;linCtrl&gt; * LGA
+        </td>
+        <td>The LGA controls, where:<br/>
+            &lt;linCtrl&gt; = float * GA, label
+
+        </td>
+    </tr>
+    <tr>
+        <td>Uint
+        </td>
+        <td>LTS
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;linCtrl&gt; * LTS
+        </td>
+        <td>The LTS controls, where:<br/>
+            &lt;linCtrl&gt; = float * TS, label
+
+        </td>
+    </tr>
+    <tr>
+        <td>Uint
+        </td>
+        <td>LTA
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;linCtrl&gt; * LTA
+        </td>
+        <td>The LTA controls, where:<br/>
+            &lt;linCtrl&gt; = float * TA, label
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;PrtOffLinCtrls&gt; * 5
+        </td>
+        <td>The offset linear control for Age and Gender for each race, where:<br/>
+&lt;PrtOffLinCtrls&gt; = &lt;PrtOffLinCtrl&gt; * 2<br/>
+&lt;PrtOffLinCtrl&gt; = &lt;float * GS, float&gt;, &lt;float * TS, float&gt;<br/>
+The 2nd & 4th numbers being the offsets and the 1st & 3rd number groups composing the covariantly scaled axes.<br/>
+The 5 races are given in the order: All, Afro, Asia, Eind, Euro.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;OffLinCtrl&gt; * <br/>
+        (5^2-5 = 20)
+
+        </td>
+        <td>The race morphing offset linear controls in the order:<br/>
+All - {Afro, Asia, Eind, Euro}<br/>
+Afro - {All,Asia, Eind, Euro}<br/>
+Asia - {All, Afro, Eind, Euro}<br/>
+etc.<br/>
+&lt;OffLinCtrl&gt; = float * GS, float * TS, float<br/>
+The last number being the offset and the first numbers composing the covariantly scaled axis.
+
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;density&gt; * 5
+        </td>
+        <td>The density distributions for each race group, where:<br/>
+&lt;density&gt; = &lt;combined density&gt;, &lt;geo density&gt;, &lt;tex density&gt;<br/>
+&lt;combined density&gt; = &lt;mean&gt;, &lt;col&gt; * (GS + TS)<br/>
+&lt;mean&gt; = float * (GS + TS)<br/>
+&lt;col&gt; = float * (GS + TS) are the weighted bases.<br/>
+&lt;geo density&gt; = float * GS * GS<br/>
+&lt;tex density&gt; = float * TS * TS
+        </td>
+    </tr>
+    <tr>
+        <td>NEWER VERSION ONLY:<br/>
+&lt;combined density&gt; * 2
+
+        </td>
+        <td>The improved separated male and female (resp.) all races distributions.
+        </td>
+    </tr>
+</table>
+<br/><br/>
+<h2>EGM</h2>
+<p>A binary format containing the principal component modes as one standard deviation vertex deltas.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr style="border:1px solid #aaa;">
+        <td>char[8]
+        </td>
+        <td>Magic number for this filetype: 'FREGM002'
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of vertices (V) (Should equal V+K in TRI file)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of symmetric morph modes (S)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of asymmetric morph modes (A)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Geometry Basis Version
+        </td>
+    </tr>
+    <tr>
+        <td>char[40]
+        </td>
+        <td>Reserved
+        </td>
+    </tr>
+    <tr>
+        <td>(float+(short*3)*V)*S
+        </td>
+        <td>Symmetric morph mode data for each vertex and all modes.<br/>
+For each mode in S,<br/>
+    Start with a floating point scale value x<br/>
+    For each vertex in V,<br/>
+The morph values are stored as 3 signed short <strong>m</strong>.  The actual morph values should be <strong>m</strong> * x.
+        </td>
+    </tr>
+    <tr>
+        <td>(float+(short*3)*V)*A
+        </td>
+        <td>As above for the asymmetric morph modes.
+        </td>
+    </tr>
+</table>
+<br/><br/>
+<h2>EGT</h2>
+<p>A binary file format containing texture statistics data for each pixel for each mode.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>char[8]
+        </td>
+        <td>Magic number for this filetype: 'FREGT003'
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of image rows (R)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of image columns (C)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of symmetric morph modes (S)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Number of asymmetric morph modes (A)
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Texture Basis Version
+        </td>
+    </tr>
+    <tr>
+        <td>char[36]
+        </td>
+        <td>Reserved
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;mode&gt; * S
+        </td>
+        <td>Symmetric texture modes. Where:<br/>
+&lt;mode&gt; = float s, &lt;image&gt; r, &lt;image&gt; g, &lt;image&gt; b<br/>
+Where s is the scale factor:<br/>
+&lt;image&gt; = (signed char * R) * C<br/>
+Multiplying each image component by s yields the RGB mode.  Image is defined as left to right, and top to bottom.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;mode&gt; * A
+        </td>
+        <td>Asymmetric texture modes.
+        </td>
+    </tr>
+</table>
+<br/><br/>
+<h2>FG</h2>
+<p>A binary file format containing a face coordinate and optionally a detail texture for that face. </p>
+<p>FaceGen version 2.1 has a different Texture Basis Version from version 2.2 since the basis has changed. If you need to read version 2.1 FG files into version 2.2 statistics, contact us for conversion instructions.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>char[8]
+        </td>
+        <td>'FRFG0001'
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Geometry Basis Version - Should match EGM. Use 0 if no geometry coordinates provided.
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Texture Basis Version - Should match EGT. Use 0 if no texture coordinates provided.
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>SS - number of symmetric shape modes (>0) -- Same # as in EGM
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>SA - number of asymmetric shape modes (>0) -- Same # as in EGM
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>TS - number of symmetric texture modes (>0) -- Same # as in EGT
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>TA - number of asymmetric texture modes (>0) -- Same # as in EGT
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Must be 0.
+        </td>
+    </tr>
+    <tr>
+        <td>unsigned long
+        </td>
+        <td>Detail Texture flag - 0 if none, 1 if present.
+        </td>
+    </tr>
+    <tr>
+        <td>signed short [SS]
+        </td>
+        <td>Symmetric shape mode coefficients (scaled up by a factor of 1000).
+        </td>
+    </tr>
+    <tr>
+        <td>signed short [SA]
+        </td>
+        <td>Asymmetric shape mode coefficients (scaled up by a factor of 1000).
+        </td>
+    </tr>
+    <tr>
+        <td>signed short [TS]
+        </td>
+        <td>Symmetric texture mode coefficients (scaled up by a factor of 1000).
+        </td>
+    </tr>
+    <tr>
+        <td>signed short [TA]
+        </td>
+        <td>Asymmetric texture mode coefficients (scaled up by a factor of 1000).
+        </td>
+    </tr>
+    <tr>
+        <td>[&lt;DetailImg&gt;]
+        </td>
+        <td>Detail texture image, where:<br/>
+&lt;DetailImg&gt; = N, &lt;jpg&gt;<br/>
+N is unsigned long which tells us # of bytes required to store &lt;jpg&gt;<br/>
+&lt;jpg&gt; is an RGB JPG detail image (of size 256x256, 512x512, 1024x1024, 2048x2048 or 4096x4096).
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+<h2>FIM</h2>
+<p>A binary file format containing an image resampling transform, used to transform the detail modulation image from internal (cylindrically projected) coordinates to the (arbitrary) SAM UV layout.</p>
+<p>The image resampling coordinates are in the OpenGL convention, with range [0,1], from left to right, bottom to top of the image.</p>
+<p>A value of (-1,-1) indicates that the transform falls out side of the face region and is therefore undefined.</p>
+<p>The FIM is usually subsampled from the desired transform image size, and is usually 2:1 interpolated where valid transform data exists.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>char[8]
+        </td>
+        <td>'FIMFF001'
+        </td>
+    </tr>
+    <tr>
+        <td>long
+        </td>
+        <td>W - Image width in pixels.
+        </td>
+    </tr>
+    <tr>
+        <td>long
+        </td>
+        <td>H - Image height in pixels.
+        </td>
+    </tr>
+    <tr>
+        <td>char[48]
+        </td>
+        <td>Unused
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;vec&gt;[W * H]
+        </td>
+        <td>Image resampling coordinates for each pixel, left to right, top to bottom, where:<br/>
+&lt;vec&gt; = float,float
+        </td>
+    </tr>
+</table>
+<br/><br/>
+<h2>TRI</h2>
+<p>A binary format containing a polygonal model composed of triangles and quads and, optionally, texture coordinates, either per-vertex or per-facet (indexed).  Normal information is not stored, as normals must be dynamically computed in a SSM.</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>char[8]
+        </td>
+        <td>FRTRI003
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>V, number of vertices, [1,maxInt]
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>T, number of triangles, [0,maxInt]
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>Q, number of quads, [0,maxInt]
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>LV, number of labelled vertices
+
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>LS, number of labelled surface points
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>X, number of texture coordinates, [0,maxInt]<br/>
+     (0 for per-vertex texture coordinates, X for per-facet)
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>&lt;ext&gt; Extension Info<br/>
+&lt;ext&gt; &amp; 0x01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True if there are texture coordinates.<br/>
+&lt;ext&gt; &amp; 0x02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True if surface point labels are 16bit chars.
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>Md, number of labelled difference morphs
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>Ms, number of labelled stat morphs
+        </td>
+    </tr>
+    <tr>
+        <td>int
+        </td>
+        <td>K, total number of stat morph vertices
+        </td>
+    </tr>
+    <tr>
+        <td>char[16]
+        </td>
+        <td>Reserved for future use. Set to 0 when saving.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;vert&gt; * (V+K)
+        </td>
+        <td>&lt;vert&gt; = float, float, float, in order X,Y,Z (coordinate system varies)
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;tri&gt; * T
+        </td>
+        <td>&lt;tri&gt; = int,int,int, the vertex indices of the tri facets.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;quad&gt; * Q
+        </td>
+        <td>&lt;quad&gt; = int,int,int,int, the vertex indeices of the quad facets.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;vlabels&gt; * LV
+        </td>
+        <td>&lt;vlabels&gt; = int,&lt;string&gt;<br/>
+&lt;string&gt; = int S,char[S]
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;slabels&gt; * LS
+        </td>
+        <td>&lt;slabels&gt; = int, float, float, float, &lt;string&gt;<br/>
+&lt;string&gt; = int S,char[S]
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+<p style="text-align:center;">... If  per-vertex texture coordinates (ie X == 0 and [&lt;ext&lt; & 0x01] == true): ...</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>&lt;tex&gt; * V
+        </td>
+        <td>&lt;tex&gt; = float, float in OpenGL texture coordinate system.
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+<p style="text-align:center;">... Else if  per-facet texture coordinates (ie X > 0 and [&lt;ext&gt; & 0x01] == true): ...</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>&lt;tex&gt; * X
+        </td>
+        <td>&lt;tex&gt; = float, float in OpenGL texture coordinate system.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;ttInd&gt; * T
+        </td>
+        <td>&lt;ttInd&gt; = int,int,int Indexes into the texture point list.
+        </td>
+    </tr>
+    <tr>
+        <td>&lt;qtInd&gt; * Q
+        </td>
+        <td>&lt;qtInd&gt; = int,int,int,int Indexes into the texture point list.
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+<p style="text-align:center;">... And if Md > 0: ...</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>&lt;morph&gt; * Md
+        </td>
+        <td>&lt;morph&gt; = &lt;label&gt;, &lt;deltas&gt;<br/>
+&lt;label&gt; = int N,char[N] a null terminated string holding the label.<br/>
+&lt;deltas&gt; = &lt;scale&gt;, &lt;delta&gt; * V<br/>
+&lt;scale&gt; = float (a scale factor to be multiplied to each delta)<br/>
+&lt;delta&gt; = short, short, short in order X,Y,Z.
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+<p style="text-align:center;">... And if Ms > 0: ...</p>
+<table cellspacing="5" style="border:1px solid #aaa;">
+    <tr>
+        <td>&lt;morph&gt; * Ms
+        </td>
+        <td>&lt;morph&gt; = &lt;label&gt;, &lt;L&gt;, &lt;VtxIdxList&gt;<br/>
+&lt;label&gt; = int N,char[N] a null terminated string holding the label.<br/>
+&lt;L&gt; = int. Number of model vertices affected<br/>
+&lt;VtxIdxList&gt; = int * &lt;L&gt;  The affected vertex indices  to<br/>
+    the combined vertex list.  (Note that these vertex indices <br/>
+    should always be less than V).<br/>
+Note that Sum of all &lt;L&gt; == K.
+        </td>
+    </tr>
+</table>
+<br/><br/>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/fileformats.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

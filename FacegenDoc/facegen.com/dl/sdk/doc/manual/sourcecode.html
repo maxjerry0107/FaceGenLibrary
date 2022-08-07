@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/sourcecode.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Source Code</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p>Source Code<p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Source Code</h1>
+
+<a name="porting"></a>
+<h2>Porting</h2>
+<ul>
+    <li>Language
+        <ul>
+            <li>Standard C++14 </li>
+            <li>All FaceGen libraries compile cleanly with -Wall / W4. </li>
+        </ul>
+    </li>
+    <li>Exceptions
+        <ul>
+            <li>The source code libraries use exceptions. Exceptions must be enabled in order to compile.</li>
+        </ul>
+    </li>
+    <li>RTTI
+        <ul>
+            <li>The core functionality does not use RTTI, however boost serialization is used by the example
+                programs, so RTTI is may be required for some of those.</li>
+        </ul>
+    </li>
+    <li>Endianness
+      <ul>
+        <li>The SDK is only tested on little-endian architectures, however endian converters for our file formats
+            are provided.</li>
+      </ul>
+    <li>Defines
+        <ul>
+            <li>BOOST_ALL_NO_LIB Tell boost not to generate it's own library names</li>
+        </ul>
+    </li>
+    <li>Linking
+      <ul>
+        <li>The visual studio solutions specify static CRT linkage. The *nix makefiles use dynamic</li>
+      </ul>
+</ul>
+<a name="thirdparty"></a>
+<h2>Open Source Used</h2>
+    <h3><a href="https://github.com/SingularInversions/FaceGenBaseLibrary">SingularInversions/FaceGenBaseLibrary</a></h3>
+        <p>MIT License. Used for a wide variety of generic and 3D tasks</p>
+    <h3><a href="https://www.boost.org/">BOOST</a></h3>
+        <p>Some of BOOST is included. License:</p>
+        <code>~sdk/source/LibTpBoost/boost_1_69_0/LICENSE_1_0.txt</code>
+        </p>
+    <h3><a href="http://eigen.tuxfamily.org/">Eigen</a></h3>
+        <p>Parts of the Eigen 3.3.9 linear algebra library are included in unmodified form.</p>
+        <p>Only files covered by the MPL2 license are used, and this is enforced using <code>#define EIGEN_MPL2_ONLY</code></p>
+        <p>License: <code>~sdk/source/LibTpEigen/COPYING.MPL2</code></p>
+    <h3><a href="https://github.com/nothings/stb">nothings/stb</a></h3>
+        <p>MIT License. Used for reading and writing images to PNG, JPG, BMP and TGA file formats.</p>
+    <h3><a href="https://github.com/nlohmann/json">nlohmann/json</a></h3>
+        <p>MIT License.</p>
+    <h3><a href="https://github.com/aappleby/smhasher">MurmurHash</a></h3>
+        <p>No copyright. Used for cross-platform deterministic hashing.</p>
+<a name="versionhistory"></a>
+<h2>Version History</h2>
+<p>Reverse chronological order, most recent patch number only:</p>
+<ul>
+    <li>3.T.2 Released 2022.06
+      <ul>
+        <li> update Android build </li>
+      </ul>
+    </li>
+    <li>3.T.1 Released 2022.05
+      <ul>
+        <li> update to boost 1.69 </li>
+        <li> remove IJG libjpeg library and use STB library instead </li>
+      </ul>
+    </li>
+    <li>3.S.3 Released 2022.02
+      <ul>
+        <li> 'fgbl render' add roll/tilt/pan command-line options </li>
+        <li> 'fgbl mesh inject' add deltas (-d) option </li>
+        <li> 'fgbl render run' fix -matrix output to include roll/tilt/pan values </li>
+        <li> 'fg3 cscm' faster, all steps are multithreaded with option flag </li>
+        <li> 'fg3 controls demographic edit' supports just shape or just color values <li>
+      </ul>
+    </li>
+    <li>3.S.2 Released 2021.12
+      <ul>
+        <li> 'fgbl mesh convert' modified to handle multi-mesh formats </li>
+        <li> 'fgbl render' command split into setup/run/batch (latter with multithreading) </li>
+        <li> 'fgbl render' bug fixed that sometimes caused hair render glitches </li>
+        <li> 'fg3t scm' bug fixed that sometimes caused random colors </li>
+        <li> Minor improvements and fixes </li>
+      </ul>
+    </li>
+    <li>3.S.0 Released 2021.10
+      <ul>
+        <li> Add 'fg3t ssmEyeC / ssmEyeI' commands for spherical eye SSM creation </li>
+        <li> Split 'fg3 construct' into 'fg3 cssm' and 'fg3 cscm' </li>
+        <li> Improve documentation </li>
+        <li> Minor improvements and fixes </li>
+      </ul>
+    </li>
+    <li>3.R.0 Released 2021.03
+      <ul>
+        <li> Spherical eye option in 'fg3t nrr / ssm' </li>
+        <li> Add 'fg3t scan' </li>
+        <li> Collada DAE export support </li>
+        <li> GPU speedup of detail texture modulation </li>
+        <li> Switch to C++14
+        <li> Add Daz Genesis 8.1 support
+        <li> Minor improvements and fixes </li>
+      </ul>
+    </li>
+    <li>3.Q.1 Released 2020.01
+      <ul>
+        <li> Put codebase into 'Fg' namespace, rename most global types and functions
+        <li> Speed up loading from EGM files
+        <li> Switch GUI renderer to Direct3D 11.1 (Windows only) for improved hair, specular highlights.
+        <li> Explicit Visual Studio 19 support
+        <li> Many breaking changes due to renames
+      </ul>
+    </li>
+    <li>3.P.0 Released 2019.03
+      <ul>
+        <li> Support iOS
+        <li> Replace Imagemagick with stb
+        <li> Replace JAMA with Eigen
+        <li> Refactorings including breaking changes
+      </ul>
+    </li>
+    <li>3.N.1 Released 2018.11
+      <ul>
+        <li> Fix and improve 'Quick Start' section of manual
+        <li> Add 'fg3 morph anim' for simpler morph application
+        <li> 'fg3 render' add save/load camera and pose state
+        <li> 'fg3t nrr' add fixed seam option
+        <li> Migrate boost:: thread/function/bind/etc. to std::
+        <li> Various fixes and refactorings
+      </ul>
+    </li>
+    <li>3.N.0 Released 2018.05
+        <ul>
+            <li> Support CMake, Android </li>
+            <li> Refactor 'fg3 controls' command, add slider value exports </li>
+            <li> Add file cache option to 'fg3t ssm' for faster integration of model set parts added later. </li>
+        </ul>
+    </li>
+    <li>3.M.1 Released 2018.04
+        <ul>
+            <li> Supports Artist 2.1 functions; Genesis 8, custom base maps </li>
+            <li> Update to boost 1.66 for Visual Studio 2017 support </li>
+            <li> Remove support for Visual Studio 2012 to better support C++11 </li>
+            <li> Various fixes and refactorings </li>
+        </ul>
+    </li>
+    <li>3.L.7 Released 2017.08
+        <ul>
+            <li> Add support for C++11, Visual Studio 2015/2017 </li>
+            <li> Add support for clang and intel compilers on Linux</li>
+            <li> Remove support for Visual Studio 2008, 2010 </li>
+            <li> Update to boost 1.63 </li>
+            <li> Various fixes and refactorings </li>
+        </ul>
+    </li>
+    <li>3.K.1 Released 2016.12
+      <ul>
+        <li> Improved FBX export
+        <li> Full set of FACS morphs added to 'Animate' mesh
+        <li> 'fg3t scm' now supports custom base texture integration
+        <li> Daz export includes Genesis 3 and body textures
+        <li> Default gamma value changed to 2.2
+        <li> Minor fixes, refactorings, renamings.
+      </ul>
+    <li>3.J.1 Released 2016.05
+      <ul>
+      	<li> Added 'fgppValidatePoints' for user point layout validation.</li>
+      	<li> Unicode support for command-line example programs.</li>
+      	<li> Improvements to integration tools</li>
+        <li> Minor fixes and refactorings.</li>
+      </ul>
+    </li>
+    <li>3.I.1 Released 2015.12
+      <ul>
+        <li>Export support for FBX, 3DS, PLY, LWO, MA, XSI </li>
+        <li>Updated model sets and parts</li>
+        <li>Export support for Daz Studio Genesis 1 and 2 meshes</li>
+        <li>Improve Daz export eye shape</li>
+        <li>Various refactorings and fixes including photofit and mesh construction</li>
+        <li>Improvements to sample programs GUI (Windows only)</li>
+      </ul>
+    </li>
+    <li>3.H.2 Released 2015.10
+      <ul>
+        <li>'fg3t nrr' added for non-rigid registration of custom meshes to FaceGen internal mesh.</li>
+        <li>'fg3t scm' saves results to PNG to avoid BMP issues.</li>
+        <li>'fg3 coord' added XML export/import.</li>
+        <li>Generic functionality consolidated into 'FgLibBase' and made open-source.</li>
+        <li>Update to Boost 1.58</li>
+        <li>Add support for Visual Studio 2013.</li>
+        <li>Refactorings, small fixes and feature additions.</li>
+      </ul>
+    </li>
+    <li>3.G.2 Released 2015.04
+      <ul>
+        <li>'fg3t scm' added to create SCMs from the command-line.</li>
+        <li>'fg3 render' now supports relative scale, translation, and field of view parameters.</li>
+        <li>Photofit API simplified, and now returns projective transform from fit mesh to image</li>
+        <li>Refactorings, small fixes and feature additions</li>
+      </ul>
+    </li>
+    <li>3.F.1 Released 2015.01
+      <ul>
+        <li>STL file format export</li>
+        <li>Multi-mesh FBX export</li>
+        <li>GUI example code for face controls (windows only)</li>
+        <li>Add simpler age and gender controls</li>
+        <li>Refactorings, small fixes and feature additions</li>
+      </ul>
+    </li>
+    <li>3.E.3 Released 2014.05
+      <ul>
+        <li>Add csamDefault33 model set with unified geometry and UVs, reduced eyelid lines and reduced shape change to back of head.</li>
+        <li>Improve 'fg3t ssm' to ensure seam vertices remain precisely unchanged to float precision.</li>
+        <li>'fg3t morphx' will not create duplicate morphs.</li>
+        <li>OS/X makefiles updated for xcode 5</li>
+        <li>Fix 'fg3 mesh seams'.</li>
+        <li>Add gamma correction option to 'fg3 construct'.</li>
+        <li>'fg3 mesh merge' now preserves morphs.</li>
+        <li>'fg3 morph copy' can move morphs between like meshes.</li>
+        <li>'fg3 construct' now preserves the image file format.</li>
+        <li>Support for converting a mesh to FBX format.</li>
+        <li>Improve handling of opacity in interactive renderer.</li>
+        <li>Add 'fg3 image addalpha'.</li>
+        <li>Photofit now supports a 'userPointsOnly' option for profile image fitting.</li>
+        <li>'fg3 mesh xform' improved, can now generate transforms from meshes.</li>
+        <li>Add 'fg3 view fg' command.</li>
+        <li>Fix 'fg3 mesh merge' command.</li>
+        <li>'fg3 triexport' simplified and now defaults to .PNG format.</li>
+        <li>'fg3 render' now defaults to .PNG format.</li>
+        <li>Other minor improvements and refactorings.</li>
+      </ul>
+    </li>
+    <li>3.D.0 Released 2013.11
+      <ul>
+        <li>Add new 'random' command to batch-generate random face images.
+        <li>Add new 'coord' command demonstrating access to face coordate values in .FG file.
+        <li>Add interactive surface point marking (Windows only) and surface point projection into rendered images.
+        <li>Refactor all example commands to take 'FgArgs' struct instead of legacy C 'int argc,char *argv[]'.
+        <li>Add vertex normals to '.OBJ' export.
+        <li>Bug fixes to test directories, soft render uv clamping, morphx command line parsing.
+      </ul>
+    <li>3.C.1 Released 2013.09
+      <ul>
+        <li> Add 'fg3t' tools for SSM creation, morph transfer and rebasing.
+        <li> Example commands read Wavefront .OBJ files.
+        <li> Improved mesh viewing GUI example.
+        <li> Various fixes and refactorings.
+      </ul>
+    </li>
+    <li>3.B.3 Released 2013.06
+      <ul>
+        <li> 'fg3 controls' now lists control names.
+        <li> Software rendering handles transparency.
+        <li> Update to Boost 1.52
+        <li> 'fg3 controls reflect' command added.
+        <li> 'fg3 detail' command added.
+        <li> Viewing of images in example GUI.
+        <li> Polygon depth sorting for better transparency rendering in example renderer.
+        <li> Various fixes, refactorings and speed improvements.
+      </ul>
+    </li>
+    <li>3.A.4 Released 2012.06
+      <ul>
+        <li> Make SDK easier to use by changing API and 'fg3' utility program.</li>
+        <li> Get rid of rare exception thrown in photofit.</li>
+        <li> Improve profile detail masking to avoid detail texture artifacts.</li>
+        <li> Fix endiantoggle for FG files without detail texture.</li>
+      </ul>
+    </li>
+    <li>3.9.2 Released 2011.03
+        <ul>
+            <li>Fix 'construct' to allow for shape-only or texture-only application.</li>
+            <li>Change user bootstrap point files to XML format from binary .bpt.</li>
+            <li>Add MTL support to 'triexport' of OBJ for easier texture loading.</li>
+        </ul>
+    </li>
+    <li>3.8.2 Released 2010.11
+        <ul>
+            <li>Photofit uses significantly less memory.</li>
+            <li>Lighing issue with 'fg3win render' fixed.</li>
+            <li>Add -1 option for fgppSetSpeedup() for very slow highest precision photofit.</li>
+            <li>Memory access error fixed when face in photo is too close to edge.</li>
+            <li>VRML export works properly with filenames containing spaces.</li>
+            <li>Triexport command options now support full similarity transform.</li>
+        </ul>
+    </li>
+    <li>3.7.2 Released 2010.08
+        <ul>
+            <li>Render and Substitute commands added</li>
+            <li>Photofit API now gives number of milestones.</li>
+            <li>Rare photofit bug fixed.</li>
+            <li>More regression tests added.</li>
+            <li>Triexport command replaces meshimport/meshexport</li>
+            <li>Rename Overlay command to Composite</li>
+            <li>Rename Viewer command to View</li>
+        </ul>
+    </li>
+    <li>3.6.0 Released 2009.08
+        <ul>
+            <li>Parallelize, speedup and improve photofit</li>
+            <li>Port photofit and some of the example applications to Linux</li>
+            <li>Add command-line Customizer utility (CustomizerCL.exe)</li>
+            <li>Rename 'coding' to 'construct'.</li>
+            <li>Various small bug fixes.</li>
+        </ul>
+    </li>
+    <li>3.5.0 Released 2009.04
+        <ul>
+            <li>Improvements and minor fixes in testing framework.</li>
+            <li>Add 'addAnimateMorph' utility.</li>
+            <li>Fix off-by-1 bug in detail texture mirroring.</li>
+            <li>Fix minor bugs in fg3 generate.</li>
+            <li>Photofit added ignoring green pixels capability.</li>
+            <li>Photofit now returns an error if it runs out of memory (with very large source photos).</li>
+            <li>Photofit now runs a bit faster (exact amount is platform dependent).</li>
+        </ul>
+    </li>
+    <li>3.4.1 Released 2008.10.03
+        <ul>
+            <li>Photofit bug fix for source images smaller than 256 pixels.</li>
+            <li>Interactive deformation math improved to properly account for different mesh scalings.</li>
+            <li>Maximum detail texture source reduced to 2048 from 4096 to avoid allocation errors</li>
+            <li>Fix occluding boundary artifacts if face is partly obscured by green mask or off-image.</li>
+            <li>Add gender-specific all-races distributions to reduce female beard issue</li>
+            <li>Add fixed FG file input option to 'generate' functionality.</li>
+        </ul>
+    </li>
+    <li>3.3.0 Released 2008.04.15
+        <ul>
+            <li>Various small bug fixes and portability fixes</li>
+            <li>Improve projectImageToFg and projectGeomToFg</li>
+            <li>Allow for detail textures up to 4K</li>
+            <li>FgGenerate: Allow loading TGA images with alpha channels in addition to JPG and BMP for all textures and overlays</li>
+            <li>Photofit: Improve dark skin results and force resulting colours closer to original photo</li>
+        </ul>
+    </li>
+</ul>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/sourcecode.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/deploy.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Deployment</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p>Deployment<p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Deployment</h1>
+
+    <p>For each listed functionality, the following files and directories within <code>~sdk/data/</code> are required:
+    <ul>
+      <li> FaceGen data directory identifier:
+        <ul>
+          <li> <code> _facegen_data_dir.flag </code> </li>
+        </ul>
+      </li>
+      <li> Base Library test suite and Windows rendering:
+        <ul>
+          <li> <code> base/ </code> </li>
+        </ul>
+      </li>
+      <li> Main SDK core functions
+        <ul>
+          <li><code> main/si.ctl </code></li>
+          <li><code> csam/&ltModelSetYouUse&gt/ </code></li>
+          <li><code> *.tri *.egm *.png *.egt *.fim </code> files for your custom model sets </li>
+        </ul>
+      </li>
+      <li> Main SDK test suite and generic detail textures
+        <ul>
+          <li><code> main/ </code></li>
+        </ul>
+      </li>
+      <li> Daz3D export
+        <ul>
+          <li><code> artist/daz/ </code></li>
+        </ul>
+      </li>    
+      <li> Photofit function
+        <ul>
+          <li><code> photofit/ </code></li>
+        </ul>
+      </li>
+      <li> Full SDK test suite
+        <ul>
+          <li><code> full/ </code></li>
+        </ul>
+      </li>
+    </ul>
+    <p> Specify the FaceGen data directory using <code> Fg::setDataDir(...) </code>. If you do not,
+      the directory containing the current executable will be checked for a <code> data </code> directory
+      containing the file <code> _facegen_data_dir.flag </code>. If not found it will recurse this check
+      in the parent directory.
+    </p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/deploy.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

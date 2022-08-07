@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/compile.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:59 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Compile</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p>Compile<p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Compile</h1>
+
+<h2>Windows</h2>
+    <p>Visual Studio:</p>
+    <p><code>
+    ~sdk/source/VisualStudio2017.sln<br/>
+    ~sdk/source/VisualStudio2019.sln<br/>
+    ~sdk/source/VisualStudio2022.sln
+    </code></p>
+<h2>Linux</h2>
+    <p> Make a copy of the appropriate file below as just 'Makefile'. Make any desired modifications
+        (eg. specific architecture flags such as those for AVX or NEON) then 'make':</p>
+    <p><code>
+        ~sdk/source/Makefile_linux_x64_clang_debug <br/>
+        ~sdk/source/Makefile_linux_x64_clang_release <br/>
+        ~sdk/source/Makefile_linux_x64_gcc_debug <br/>
+        ~sdk/source/Makefile_linux_x64_gcc_release <br/>
+        ~sdk/source/Makefile_linux_x64_icpc_debug <br/>
+        ~sdk/source/Makefile_linux_x64_icpc_release <br/>
+    </code></p>
+<h2>MacOS</h2>
+    <p> Ensure Xcode Command Line Tools are installed.
+    <p> Make a copy of the appropriate file below as just 'Makefile'. Make any desired modifications
+        then 'make':</p>
+    <p><code>
+    ~sdk/source/Makefile_macos_x64_clang_debug<br/>
+    ~sdk/source/Makefile_macos_x64_clang_release<br/>
+    </code>
+<h2>CMake</h2>
+    <p> CMake files are included for integration into other build systems. </b>
+    <p><code>
+         ~sdk/source/CMakeLists.txt <br/> 
+         ~sdk/source/*/CMakeLists.txt
+    </code></p> 
+<h2>Android</h2>
+    <p> Using Android Studio, on any platform: </p>
+    <ol>
+      <li> Create a project <code>prj</code> with native C++ 14 (or greater) support </li>
+      <li> From a clean copy of the FaceGen SDK, copy each of the following library directories from
+        <code>~sdk/source/</code> </li>
+      <ul>
+        <li> <code> LibTpBoost </code> </li>
+        <li> <code> LibTpEigen </code> </li>
+        <li> <code> LibTpStb </code> </li>
+        <li> <code> LibFgBase </code> </li>
+        <li> <code> LibFg3Main </code> (main SDK) </li>
+        <li> <code> LibFg3Photofit </code> (full SDK) </li>
+        <li> <code> LibFg3Full </code> (full SDK) </li>
+      </ul>
+      <li> And paste into your Android project C++ directory:
+        <code> ~prj/app/src/main/cpp/ </code> </li>
+      <li> Edit <code> ~prj/app/src/main/cpp/CMakeLists.txt </code>
+        <ul>
+          <li> After <code> project(...) </code>, add the following line for each library directory above,
+               in the given order:
+            <ul>
+              <li> <code> add_subdirectory(LibXXX) </code> </li>
+            </ul>
+          </li>
+          <li> After <code> add_library(prj ...) </code>, add the line:
+            <ul>
+              <li> <code> target_include_directories(prj PUBLIC LibFgXXX) </code> </li>
+            </ul>
+          </li>
+          <li> Where <code>LibFgXXX </code> is one of:
+            <ul>
+              <li> <code> LibFgBase </code> (open source) </li>
+              <li> <code> LibFg3Main </code> (main SDK) </li>
+              <li> <code> LibFg3Full </code> (full SDK) </li>
+            </ul>
+          </li>
+          <li> Also add <code> LibFgXXX </code> to the list of <code> target_link_libraries(prj ...) </code>
+        </ul>
+      </li>
+      <li> Create an assets folder: <code> File -> New -> Folder -> Assets Folder -> main </code> </li>
+      <li> Within that directory (<code> ~prj/app/src/main/assets </code>) create a <code> facegen </code>
+          subdirectory. Into that, copy the data you need from <code> ~sdk/data </code> (see <a href="deploy.html">Deployment</a>),  preserving the subdirectory structure. </li>
+      <li> Since Android asset files cannot be accessed via standard filesystem calls,
+        make a local filesystem copy of this <code> facegen </code> subdirectory when your app first runs
+        (example code at <code> ~sdk/source/android/AssetLoaderKotlin.kt </code>).
+        This code returns the full path to the local filesystem copy of the FaceGen data.
+        Pass that path to <code> Fg::setDataDir() </code> before using the SDK (example code at
+        <code> ~sdk/source/android/native-lib.cpp </code>).
+      </li>
+      <li>
+        Since FaceGen uses C++ exceptions, you should bracket use of FaceGen with try / catch.
+      </li>
+    </ol>
+<h2>iOS</h2>
+    <p> Using Xcode: </p>
+    <ol>
+      <li> Create a new iOS App project <code>~prj</code> </li>
+      <li> Select the target (<code>~prj/prj</code>) and File -> 'Add Files to' to add each of the
+           following directories from <code>~sdk/source</code>, making sure to deselect all
+           'add to targets' checkboxes:
+        <ul>
+          <li> <code> LibTpBoost </code> </li>
+          <li> <code> LibTpEigen </code> </li>
+          <li> <code> LibTpStb </code> </li>
+          <li> <code> LibFgBase </code> </li>
+          <li> <code> LibFg3Main </code> (main SDK) </li>
+          <li> <code> LibFg3Photofit </code> (full SDK) </li>
+          <li> <code> LibFg3Full </code> (full SDK) </li>
+        </ul>
+      </li>
+      <li> For the <code>prj</code> target -> Build Settings -> Search Paths -> System Header Search Paths
+           add:
+        <ul>
+          <li> <code> ${SRCROOT}/prj/LibTpBoost/boost_1_69_0/ </code> </li>
+          <li> <code> ${SRCROOT}/prj/LibTpEigen/ </code> </li>
+          <li> <code> ${SRCROOT}/prj/LibTpStb/ </code> </li>
+          <li> <code> ${SRCROOT}/prj/LibFgBase/src/ </code> </li>
+          <li> <code> ${SRCROOT}/prj/LibFg3Main/ </code> (main SDK) </li>
+          <li> <code> ${SRCROOT}/prj/LibFg3Photofit/ </code> (full SDK) </li>
+          <li> <code> ${SRCROOT}/prj/LibFg3Full/ </code> (full SDK) </li>
+        </ul>
+      </li>
+      <li> For the <code>prj</code> target -> Build Phases -> Compile Sources, add from
+           <code>~prj/prj/</code> :
+        <ul>
+          <li> <code> LibTpBoost/boost_1_69_0/libs/filsystem/src/* </code> </li>
+          <li> <code> LibTpBoost/boost_1_69_0/libs/serialization/src/* </code> </li>
+          <li> <code> LibFgBase/src/* </code> </li>
+          <li> <code> LibFgBase/src/nix/* </code> </li>
+          <li> <code> LibFg3Main/*.cpp *.hpp *.h </code> (main SDK) </li>
+          <li> <code> LibFg3Photofit/*.cpp *.hpp *.h </code> (full SDK) </li>
+          <li> <code> LibFg3Full/*.cpp *.hpp *.h </code> (full SDK) </li>
+        </ul>
+      </li>
+      <li> Right-click <code> ~prj/prj </code>, select <code> New Group </code> and add
+           <code> facegen </code>
+      </li>
+      <li> Right-click <code> ~prj/prj/facegen </code>, select <code> Add Files to </code>, and
+           select the data you need (see <a href="deploy.html">Deployment</a>),  from <code> ~sdk/data </code>,
+           preserving the directory structure. Make sure to de-select <code> Add to targets </code>.
+      </li>
+      <li> At runtime, make a copy of the above directory in the sandbox, and pass the path for that
+           sandbox directory to <code> Fg::setDataDir() </code>
+      </li>
+      <li>
+        Since FaceGen uses C++ exceptions, you should bracket FaceGen interfaces with try / catch.
+      </li>
+    </ol>
+
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/compile.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:55:59 GMT -->
+</html>

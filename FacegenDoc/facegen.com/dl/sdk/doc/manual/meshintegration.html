@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/meshintegration.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Mesh Integration</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p>Mesh Integration<p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p><a style="color:#FFFFFF" href="commands.html">Commands</a><p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Mesh Integration</h1>
+
+<h2>Overview</h2>
+    <p> Create a statistical shape model (SSM) for all meshes which must change shape with the head.
+        SSMs consist of a base mesh (.fgmesh or .tri) and shape statistics (.egm).</p>
+    <p> Create a statistical colour model (SCM) for all color maps which contain skin.
+        SCMs consist of a base image (.jpg, .png, etc.), color statistics (.egt file), and a detail texture
+        resampling transform (.fim file) for maps which include the face area.</p>
+    <p> An SSM and SCMs that are part of the same mesh are referred to as a statistical appearance model (SAM).</p>
+    <p> SAMs that fit together (such as a head and hairstyles) are referred to as a 'Model Set'</p>
+    <p>Model sets are described at
+       <a href="https://facegen.com/modeller_sets.htm">https://facegen.com/modeller_sets.htm</a>
+        and stored locally here:</p>
+    <p><code>~sdk/data/csam</code></p>
+    <p>Model sets not included by default in the SDK distribution can be downloaded from the above link.</p>
+<h2>Head Mesh Design</h2>
+    <p> Having a separate color map for the head (rather than the entire body) is important for performance.</p>
+    <p> Having the head as a separate mesh entirely (ie separate vertex list) is not necessary.
+    <p> The best place for the neck seam is at the bottom of the neck (or including a 'bib' below it),
+        so that the color map at the neck seam will be a constant colour and the body color statistics can be small.
+    <p> The UV map for the head should avoid overlaps, including mirror overlaps.</p>
+    <p> For integration, the shape of your base head mesh in the face area must conform very closely to the
+        FaceGen internal base face. Get a copy as facegen-internal-base-face.obj with the command:</p>
+    <p><code> $> fg3 util internal obj</code></p>
+    <p> You can scale, rotate and move this mesh to your coordinate system, but don't change it's shape.</p>
+<a name="ssms"></a>
+<h2>Creating an SSM</h2>
+    <p> If you have an existing mesh which is not closely matched to the shape of the FaceGen internal base face,
+        you can manually align it using 3D modeling tools, or you can use our automated utility to get most of the way
+        there. </p>
+    <p> Export your highest LOD base head (or body) mesh in neutral expression with no eyelashes or other obsfucating
+        surfaces: <code>'myShape.obj'</code>, then:.
+    <p><code>$> fgbl mesh convert myShape.obj myShape.fgmesh <br>
+        > fg3t nrr myShape.fgmesh name myHead.obj myHead_blink.obj myHeadLOD.obj myHair.obj ...</code>
+    <p> This will adjust the shape of all the mesh arguments after 'name' to match the FaceGen internal base face. </p>
+    <p> This command must be done on Windows since you use the GUI (Windows-only) to mark points on the surface
+        for the registration process (<a href="https://facegen.com/man_int_head.htm">points description</a>)
+        If you need to run it again later you can use other platforms as the marked-up myShape.fgmesh is re-saved.
+    <p>Validate your reshaped base mesh against the FaceGen internal mesh by comparing the outputs
+        'name_myHead.fgmesh' and 'name_internal.fgmesh'.
+    <p>In case you later want to use your original face shape within FaceGen it is stored as the face coordinate
+        in 'name.fg'.
+    <p> If you want to keep the neck seam of your head mesh(es) fixed, edit 'name_myHead.fgmesh' to keep
+        only the seam vertices that you wish to keep fixed and save as 'fixedVerts.obj'
+    <p> Add any statistical morphs to your models (deltas can be added later):
+    <p> <code>$> fgbl morph create name_myHead.fgmesh name_myHead_blink.fgmesh t "Blink Eyes"</code>
+    <p> Generate the EGM files for your meshes. It's best to do this in one go since it takes a long
+        time to run, regardless of how many meshes are being processed:</p>
+    <p><code>$>
+        fg3t ssm name_internal.fgmesh -hires -fv fixedVerts.obj name_myHead.fgmesh name_myHeadLOD.fgmesh name_myHair.fgmesh ...
+      </code></p>
+    <p> You can add delta morphs to your .fgmesh files after this, but if you add any target morphs (which become
+        statistical morphs once you generate an EGM file), you need to re-run the 'fg3t ssm' command.</p>
+    <p> Spherical eyes are supported with the 'fg3t ssmEyeC' and 'fg3t ssmEyeI' commands. These will generate SSM
+        data for eye vertices which preserves shape so that the eyes remain spherical for rotation.
+        Not that morphing the eye & lid surfaces will yield better visual results than spherical eyes separate from
+        lids, due to the latter exposing areas where the color cannot be properly reconstructed.
+        
+<a name="scms"></a>
+<h2>Creating an SCM</h2>
+    <p> For each color map containing skin, you will need to create a statistical color model (SCM) comprising
+        a base image file, an .EGT file and (for the face area only) a .FIM file.
+    <p> Beginning with your internal base face aligned head mesh (see above),
+        extract all relevent parts for a given color map into a single .OBJ file, for instance 'head.obj',
+        then create the SCM:</p>
+    <p> <code> $> fg3t scm name_internal.fgmesh head.obj 512</code></p>
+    <p> The last number (must be power of 2) gives the pixel size of the base image and statistics file.
+        This can be very small for the body since there is no color variation below the base of the neck.
+        For the head, it's typically 512 if you want to capture the full detail. </p>
+    <p> This will create the files 'head.png', 'head.egt' and, if the uv map contains any of the face,
+        'head.fim' and 'head_fade-gen.jpg'. If you plan to integrate the FaceGen face color map with
+        pre-existing body color maps, you should edit 'head_fade-gen.jpg' to ensure proper blending (black maps
+        to FaceGen color and white maps to the body map), then save as 'head_fade.jpg'.</p>
+    <p> Now view your mesh with the newly created texture image and look carefully at the eyes - you may need
+        to tweak the shape of 'head.obj' and repeat until the eye contour lines up perfectly with the
+        color 'spray painting' process.</p>
+<h2>Animation Targets</h2>
+    <p> You can use your own bone-based or morph-based targets, or you can copy our morphs (see below).</p>
+    <p> Since FaceGen shape changes do not affect scale, most animation targets will look appropriate on any face shape, whether done with bones or delta morphs. </p>
+    <p> For bones, you may have to include bone vertices in the vertex list modified by FaceGen for best results. </p>
+    <p> For morphs in which the target shape must meet a specific place on the face, such as eye blinks, define your morph as a 'target morph' rather than a 'delta morph'. Most morphs, however, will look best as delta morphs.</p>
+    <p> To add delta or target morphs, convert your base mesh to a .fgmesh file then create:</p>
+    <p><code>
+    $> fgbl mesh convert head.obj head.fgmesh<br>
+    $> fgbl morph create head.fgmesh headWithDeltaMorph.obj d deltaMorphName <br>
+    $> fgbl morph create head.fgmesh headWithTargetMorph.obj t targetMorphName <br>
+    </code></p>
+    <p>Delta morphs can be added anytime. Target morphs must be added before creating the SSM (below).</p>
+<h2>Copying FaceGen Animation Morphs</h2>
+    <p>Locate the 'Animate' model set base head mesh:</p>
+    <p><code> $> fgbl mesh convert ~sdk/data/csam/Animate/Head/HeadHires.tri base.obj</code></p>
+    <p>Create an open pose - a pose where vertices that move differently are well separated,
+       such as 'Phoneme: big aah' and a half blink (of both eyes):</p>
+    <p>
+      <code> $> fgbl morph list HeadHires.tri</code><br>
+      <code> $> fgbl morph apply HeadHires.tri baseOpen.obj d 84 1 t 5 0.5 t 6 0.5</code>
+    </p>
+    <p>Move/rotate/scale these meshes to align with yours as you did with the internal base mesh and save (eg.
+    <code>'baseMoved.obj'  'baseOpenMoved.obj'</code>).
+       You will need to adjust the shape of your mesh to ensure that it is closely
+       aligned with <code>'base.obj'</code> over the face region, and you will also need to create an open pose for your
+       mesh that is closely aligned with <code>'baseOpen.obj'</code> over the face region. (eg.
+       <code>'head.obj'  'headOpen.obj'</code>).
+     </p>
+    <p> Generate the similarity transform from our default mesh coordinate system to yours:</p>
+    <p> <code>$> fgbl mesh xform create transform.xml base.obj baseMoved.obj</code></p>
+    <p> Transform our default skin mesh into your coordinate system along with all its morph information:</p>
+    <p> <code>$> fgbl mesh xform apply transform.xml HeadHires.tri baseMoved.tri</code></p>
+    <p> Make a copy of your mesh to receive the morph data:</p>
+    <p> <code>$> fgbl mesh convert head.obj head.fgmesh</code></p>
+    <p> Copy over all the morphs (this will take a couple of minutes per morph):</p>
+    <p> <code>$> fg3t morphx baseMoved.tri -o baseOpenMoved.obj head.tri -o headOpen.obj</code></p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/meshintegration.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>

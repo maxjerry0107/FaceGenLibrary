@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/commands.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+<head>
+<script type="text/javascript" src="../../../../MathJax-2.7.0/MathJaxdda6.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<meta charset="UTF-8">
+
+<style>
+a {
+    text-decoration: none;
+}
+nav {
+    width: 160px;
+    float: left;
+    display: inline;
+    padding: 15px;
+    font-size: 120%;
+    background-color: #4471AF;
+}
+section.body {
+    max-width:800px;
+    margin-left:auto;
+    margin-right:auto;
+}
+h2 ~ *:not(h2) {
+    margin-left: 30px;
+}
+</style>
+<title>FaceGen SDK Manual - Commands</title>
+</head>
+<body>
+<nav>
+<p><a style="color:#FFFFFF" href="index.html">Install</a><p><a style="color:#FFFFFF" href="quick.html">Quick Start</a><p><a style="color:#FFFFFF" href="compile.html">Compile</a><p><a style="color:#FFFFFF" href="overview.html">Overview</a><p><a style="color:#FFFFFF" href="requirements.html">Requirements</a><p><a style="color:#FFFFFF" href="meshintegration.html">Mesh Integration</a><p><a style="color:#FFFFFF" href="integration.html">Engine Integration</a><p><a style="color:#FFFFFF" href="deploy.html">Deployment</a><p>Commands<p><a style="color:#FFFFFF" href="faq.html">FAQ</a><p><a style="color:#FFFFFF" href="sourcecode.html">Source Code</a><p><a style="color:#FFFFFF" href="indepth.html">In Depth</a><p><a style="color:#FFFFFF" href="fileformats.html">File Formats</a>
+</nav>
+<section class="body">
+<h1 style="font-size:200%"><span style="color:#CCCCCC"><span style="color:#4471AF">F</span>ace<span style="color:#4471AF">G</span>en</span> SDK Manual - Commands</h1>
+
+<h2> Overview </h2>
+<p> There are 4 command-line interface (CLI) executables, based on function-level distribution. </p>
+<p> They are all available on Windows, MacOS and Linux, however only the Windows versions include GUI functionality
+    required by some commands (eg. 'view mesh'). </p>
+<p> For all commands, documentation is available by typing the command without any arguments,
+    and follows typical unix CLI description conventions. </p>
+<p> Many of the commands have sub-commands, whose documentation can be obtained similarity. </p>
+</p>
+<h2> fgbl </h2>
+<p> The FaceGen base library CLI has all the functionality not directly related to our core face technology.
+   It is free, open-source, and available on
+   <a href="https://github.com/SingularInversions/FaceGenBaseLibrary">github</a> </p>
+<p><code> $> fgbl </code> </p>
+<table>
+<tr><td width=100px><code> cons </code></td> <td><code>- Construct makefiles / solution file / project files </code></td></tr>
+<tr><td width=100px><code> d3d </code></td> <td><code>- Compile Direct3D shaders (Windows only) </code></td></tr>
+<tr><td width=100px><code> graph </code></td> <td><code>- Create simple bar graphs from text data </code></td></tr>
+<tr><td width=100px><code> image </code></td> <td><code>- Image operations </code></td></tr>
+<tr><td width=100px><code> mesh </code></td> <td><code>- 3D Mesh IO and manipulation tools </code></td></tr>
+<tr><td width=100px><code> morph </code></td> <td><code>- List, apply or create animation morphs for 3D meshes </code></td></tr>
+<tr><td width=100px><code> render </code></td> <td><code>- Render meshes with color & specular maps to an image file </code></td></tr>
+<tr><td width=100px><code> substitute </code></td> <td><code>- Substitute first instance of exact strings in a text file </code></td></tr>
+<tr><td width=100px><code> sys </code></td> <td><code>- Show system info </code></td></tr>
+<tr><td width=100px><code> test </code></td> <td><code>- Automated tests </code></td></tr>
+<tr><td width=100px><code> testm </code></td> <td><code>- Manual tests </code></td></tr>
+<tr><td width=100px><code> view </code></td> <td><code>- Interactive GUI view of images and meshes (Windows only) </code></td></tr>
+</table>
+
+<h2> fg3 </h2>
+<p> The FaceGen Main SDK CLI has all our face creation and editing functionality except for the face-from-photo function.
+    It is a paid license that includes full source code. </p>
+<p><code> $> fg3 </code> </p>
+<table>
+<tr><td width=100px><code> basis </code></td> <td><code>- Export SSM and SCM basis modes to TXT files </code></td></tr>
+<tr><td width=100px><code> controls </code></td> <td><code>- Parametric controls on face coordinates in an .FG file </code></td></tr>
+<tr><td width=100px><code> coord </code></td> <td><code>- list / set face coordinates in an .FG file </code></td></tr>
+<tr><td width=100px><code> create </code></td> <td><code>- Create random or average face in an FG file </code></td></tr>
+<tr><td width=100px><code> cscm </code></td> <td><code>- Construct a color map from an SCM and a face </code></td></tr>
+<tr><td width=100px><code> cssm </code></td> <td><code>- Construct a mesh from an SSM and a face </code></td></tr>
+<tr><td width=100px><code> detail </code></td> <td><code>- Extract/insert a detail texure from/to an .FG file </code></td></tr>
+<tr><td width=100px><code> endian </code></td> <td><code>- Change endianness of FaceGen 3 file formats </code></td></tr>
+<tr><td width=100px><code> interactive </code></td> <td><code>- Apply interactive deformations to an SSM and face coordinate </code></td></tr>
+<tr><td width=100px><code> random </code></td> <td><code>- Batch create random face images </code></td></tr>
+<tr><td width=100px><code> scmBase </code></td> <td><code>- Apply custom base textures to the SCMs of a body </code></td></tr>
+<tr><td width=100px><code> test </code></td> <td><code>- Automated tests </code></td></tr>
+<tr><td width=100px><code> util </code></td> <td><code>- Utility functions </code></td></tr>
+<tr><td width=100px><code> view </code></td> <td><code>- interactive GUI view of SAMs, FG files, FIM files (Windows only) </code></td></tr>
+</table>
+
+<h2> fg3pf </h2>
+<p> The FaceGen PhotoFit SDK CLI has the face-from-photo function.
+    It is a paid license that includes full source code. </p>
+<p><code> $> fg3pf </code> </p>
+<table>
+<tr><td width=100px><code> batch </code></td> <td><code>- Batch process photofits. </code></td></tr>
+<tr><td width=100px><code> photofit </code></td> <td><code>- Create FG data from an image. </code></td></tr>
+<tr><td width=100px><code> test </code></td> <td><code>- Automated photofit tests </code></td></tr>
+</table>
+
+<h2> fg3t </h2>
+<p> The FaceGen Integration Tools CLI contains tools for integrating FaceGen statistics with your meshes,
+    along with some other tools. It is a closed-source binary-only tool. </p>
+<p><code> $> fg3t </code> </p>
+<table>
+<tr><td width=100px><code> morphx </code></td> <td><code>- Spatially extrapolate morphs to an aligned mesh with different topology </code></td></tr>
+<tr><td width=100px><code> nrr </code></td> <td><code>- Non-rigid registration of custom mesh to FaceGen internal shape </code></td></tr>
+<tr><td width=100px><code> rebasex </code></td> <td><code>- Spatially extrapolate a base mesh morph to related assets </code></td></tr>
+<tr><td width=100px><code> scan </code></td> <td><code>- Extract FaceGen shape coordinates from a 3D scan mesh </code></td></tr>
+<tr><td width=100px><code> scm </code></td> <td><code>- Create an SCM (.jpg .egt [.fim] ) for a skin color map (head or body) </code></td></tr>
+<tr><td width=100px><code> ssm </code></td> <td><code>- Create SSMs (.egm file) for base meshes (head or accessory) </code></td></tr>
+<tr><td width=100px><code> ssmEyeC </code></td> <td><code>- Create shape-preserving SSMs (.egm files) for separate spherical eye meshes </code></td></tr>
+<tr><td width=100px><code> ssmEyeI </code></td> <td><code>- Inject shape-preserving SSM data for spherical eyes into a body SSM (.egm) </code></td></tr>
+</table>
+
+<p>
+
+</section>
+<footer style="text-align:center; background-color:#4471AF; color:#FFFFFF; width:100%">
+<div style="height:1px"></div>
+<p>&copy; Singular Inversions 2022
+<div style="height:1px"></div>
+</footer>
+</body>
+
+<!-- Mirrored from facegen.com/dl/sdk/doc/manual/commands.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Aug 2022 21:56:01 GMT -->
+</html>
